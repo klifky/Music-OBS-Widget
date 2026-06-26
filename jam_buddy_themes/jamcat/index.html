@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<base href="/jam_buddy_themes/jamcat/">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: transparent;
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  #buddy {
+    position: relative;
+    width: 300px;
+    height: 300px;
+  }
+  #buddy video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* fade transition between states */
+    transition: opacity 0.4s ease;
+  }
+  /* Only the active video is visible */
+  #buddy video.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="buddy">
+  <video id="vid-idle"    src="idle.webm"    autoplay loop muted playsinline></video>
+  <video id="vid-loading" src="loading.webm" autoplay loop muted playsinline class="hidden"></video>
+  <video id="vid-active"  src="active.webm"  autoplay loop muted playsinline class="hidden"></video>
+</div>
+
+<script>
+const BASE_BPM = 120.0;
+
+const vidIdle    = document.getElementById('vid-idle');
+const vidLoading = document.getElementById('vid-loading');
+const vidActive  = document.getElementById('vid-active');
+
+// ── State ──────────────────────────────────────────────────────────────────
+// 'idle' | 'loading' | 'active'
+let state = 'idle';
+
+function setState(next, bpm) {
+  if (next === state && next !== 'active') return;
+  state = next;
+
+  // Hide all
+  [vidIdle, vidLoading, vidActive].forEach(v => v.classList.add('hidden'));
+
+  if (next === 'idle') {
+    vidIdle.classList.remove('hidden');
+  } else if (next === 'loading') {
+    vidLoading.classList.remove('hidden');
+  } else if (next === 'active') {
+    // Adjust playback speed to match detected BPM
+    if (bpm && bpm > 0) {
+      let rate = bpm / BASE_BPM;
+      // Clamp to browser-safe playbackRate range
+      rate = Math.max(0.1, Math.min(4.0, rate));
+      vidActive.playbackRate = rate;
+    }
+    vidActive.classList.remove('hidden');
+  }
+}
+
+// ── WebSocket ──────────────────────────────────────────────────────────────
+function connect() {
+  const ws = new WebSocket('ws://localhost:8765');
+
+  ws.addEventListener('open', () => {
+    ws.send(JSON.stringify({ type: 'hello', client: 'widget' }));
+  });
+
+  ws.addEventListener('message', (e) => {
+    let msg;
+    try { msg = JSON.parse(e.data); } catch { return; }
+
+    if (msg.type === 'state') {
+      const d = msg.data;
+      if (!d) return;
+      if (d.playing) {
+        // playing but waiting for BPM — stay in current state, don't revert to idle
+        if (state === 'idle') setState('loading');
+      } else {
+        setState('idle');
+      }
+    }
+
+    if (msg.type === 'bpm_loading') {
+      setState('loading');
+    }
+
+    if (msg.type === 'bpm') {
+      setState('active', msg.bpm);
+    }
+
+    if (msg.type === 'disconnected') {
+      setState('idle');
+    }
+  });
+
+  ws.addEventListener('close', () => setTimeout(connect, 3000));
+  ws.addEventListener('error', () => ws.close());
+}
+
+connect();
+</script>
+</body>
+</html>

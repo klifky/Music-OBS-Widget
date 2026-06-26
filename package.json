@@ -1,0 +1,13 @@
+{
+  "name": "music-obs-widget",
+  "version": "1.0.0",
+  "description": "Now-playing music widgets for OBS — player, equalizer and an animated 'jam buddy', driven by Windows SMTC. Themeable, controlled from a system-tray app.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "license": "MIT"
+}

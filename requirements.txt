@@ -1,0 +1,10 @@
+# Python dependencies for the capture scripts (smtc_reader / eq_capture / bpm_capture)
+# Windows only. Install with:  pip install -r requirements.txt
+numpy
+PyAudioWPatch
+websocket-client
+websockets
+winrt-Windows.Media.Control
+winrt-Windows.Storage.Streams
+winrt-Windows.Foundation
+winrt-Windows.Foundation.Collections

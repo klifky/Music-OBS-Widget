@@ -1,0 +1,12 @@
+{
+    "buddy_update_enabled":  true,
+    "source_app_id":  "spotify",
+    "buddy_method_flux":  true,
+    "eq_theme":  "glowed",
+    "buddy_lock_overrange":  false,
+    "widget_theme":  "infinite",
+    "buddy_window_sec":  6,
+    "buddy_theme":  "default",
+    "buddy_lock_bpm":  140,
+    "buddy_update_rate":  12
+}
