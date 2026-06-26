@@ -1,29 +1,20 @@
-# Dependencies
+# Node
 node_modules/
 
-# Logs
-*.log
-widget-tray.log
-install.log
-
-# Config (user-specific device settings)
-eq_config.json
-
-# Python cache
+# Python
 __pycache__/
 *.pyc
-*.pyo
 
-# Build artifacts
-*.obj
+# Runtime logs
+*.log
+
+# Build output
+dist/
+build/
 *.exe
-spotify_audio.cpp
-spotify_audio.manifest
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Editor
+# Editors / OS
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
